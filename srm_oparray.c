@@ -256,6 +256,17 @@ static const op_usage opcodes[] = {
 
 zend_brk_cont_element* vld_find_brk_cont(int nest_levels, int array_offset, zend_op_array *op_array);
 
+static char *vld_color(const char *string, const char *color)
+{
+	int len = strlen(string) + strlen(color) + strlen(COLOR_RESET) + 3;
+	char *colorStr = malloc(len);
+
+	memcpy(colorStr, string, strlen(string) + 1);
+	sprintf(colorStr, "%s%s%s", VLD_G(colors) ? color : "", string, VLD_G(colors) ? COLOR_RESET : "");
+	
+	return colorStr;
+}
+
 static inline int vld_dump_zval_null(ZVAL_VALUE_TYPE value)
 {
 	return vld_printf (stderr, "null");

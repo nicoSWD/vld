@@ -42,6 +42,7 @@ ZEND_BEGIN_MODULE_GLOBALS(vld)
 	int execute;
 	int verbosity;
 	int format;
+	int colors;
 	char *col_sep;
 	int save_paths;
 	char *save_dir;
