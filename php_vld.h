@@ -42,12 +42,12 @@ ZEND_BEGIN_MODULE_GLOBALS(vld)
 	int execute;
 	int verbosity;
 	int format;
-	int colors;
 	char *col_sep;
 	int save_paths;
 	char *save_dir;
 	FILE *path_dump_file;
 	int dump_paths;
+	int colors;
 ZEND_END_MODULE_GLOBALS(vld) 
 
 int vld_printf(FILE *stream, const char* fmt, ...);

@@ -256,7 +256,7 @@ static const op_usage opcodes[] = {
 
 zend_brk_cont_element* vld_find_brk_cont(int nest_levels, int array_offset, zend_op_array *op_array);
 
-static char *vld_color(const char *string, const char *color)
+char *vld_color(const char *string, const char *color)
 {
 	int len = strlen(string) + strlen(color) + strlen(COLOR_RESET) + 3;
 	char *colorStr = malloc(len);
@@ -678,9 +678,9 @@ void vld_dump_op(int nr, zend_op * op_ptr, unsigned int base_address, int notdea
 		}
 	} else {
 		if (VLD_G(format)) {
-			vld_printf(stderr, "%5d %s %c %c %c %c %s %-28s %s %-14s ", nr, VLD_G(col_sep), notdead ? ' ' : '*', entry ? 'E' : ' ', start ? '>' : ' ', end ? '>' : ' ', VLD_G(col_sep), opcodes[op.opcode].name, VLD_G(col_sep), fetch_type);
+			vld_printf(stderr, "%5d %s %c %c %c %c %s %-28s %s %-14s ", nr, VLD_G(col_sep), notdead ? ' ' : '*', entry ? 'E' : ' ', start ? '>' : ' ', end ? '>' : ' ', VLD_G(col_sep), vld_color(opcodes[op.opcode].name, notdead ? COLOR_GREEN : COLOR_RED), VLD_G(col_sep), fetch_type);
 		} else {
-			vld_printf(stderr, "%5d%c %c %c %c %-28s %-14s ", nr, notdead ? ' ' : '*', entry ? 'E' : ' ', start ? '>' : ' ', end ? '>' : ' ', opcodes[op.opcode].name, fetch_type);
+			vld_printf(stderr, "%5d%c %c %c %c %-28s %-14s ", nr, notdead ? ' ' : '*', entry ? 'E' : ' ', start ? '>' : ' ', end ? '>' : ' ', vld_color(opcodes[op.opcode].name, notdead ? COLOR_GREEN : COLOR_RED), fetch_type);
 		}
 	}
 
@@ -784,22 +784,26 @@ void vld_dump_oparray(zend_op_array *opa TSRMLS_DC)
 	if (VLD_G(dump_paths)) {
 		vld_analyse_oparray(opa, set, branch_info TSRMLS_CC);
 	}
+
+	const char *funcName = ZSTRING_VALUE(opa->function_name);
+	funcName = funcName ? vld_color(funcName, COLOR_LIGHT_BLUE) : funcName;
+
 	if (VLD_G(format)) {
-		vld_printf (stderr, "filename:%s%s\n", VLD_G(col_sep), ZSTRING_VALUE(opa->filename));
-		vld_printf (stderr, "function name:%s%s\n", VLD_G(col_sep), ZSTRING_VALUE(opa->function_name));
+		vld_printf (stderr, "filename:%s%s\n", VLD_G(col_sep), vld_color(ZSTRING_VALUE(opa->filename), COLOR_LIGHT_BLUE));
+		vld_printf (stderr, "function name:%s%s\n", VLD_G(col_sep), funcName);
 		vld_printf (stderr, "number of ops:%s%d\n", VLD_G(col_sep), opa->last);
 	} else {
-		vld_printf (stderr, "filename:       %s\n", ZSTRING_VALUE(opa->filename));
-		vld_printf (stderr, "function name:  %s\n", ZSTRING_VALUE(opa->function_name));
-		vld_printf (stderr, "number of ops:  %d\n", opa->last);
+		vld_printf (stderr, "filename:       %s\n", vld_color(ZSTRING_VALUE(opa->filename), COLOR_LIGHT_BLUE));
+		vld_printf (stderr, "function name:  %s\n", funcName);
+		vld_printf (stderr, "number of ops:  %s\n", vld_color((char*)&opa->last, COLOR_LIGHT_BLUE));
 	}
 #ifdef IS_CV /* PHP >= 5.1 */
 	vld_printf (stderr, "compiled vars:  ");
 	for (i = 0; i < opa->last_var; i++) {
-		vld_printf (stderr, "!%d = $%s%s", i, OPARRAY_VAR_NAME(opa->vars[i]), ((i + 1) == opa->last_var) ? "\n" : ", ");
+		vld_printf (stderr, "!%d = $%s%s", i, vld_color(OPARRAY_VAR_NAME(opa->vars[i]), COLOR_BLUE), ((i + 1) == opa->last_var) ? "\n" : ", ");
 	}
 	if (!opa->last_var) {
-		vld_printf(stderr, "none\n");
+		vld_printf(stderr, vld_color("none\n", COLOR_BLUE));
 	}
 #endif
 	if (VLD_G(format)) {

@@ -257,9 +257,10 @@ static int vld_dump_fe (zend_op_array *fe APPLY_TSRMLS_DC, int num_args, va_list
 		int new_len;
 
 		new_str = php_url_encode(ZHASHKEYSTR(hash_key), ZHASHKEYLEN(hash_key) - 1 PHP_URLENCODE_NEW_LEN(new_len));
-		vld_printf(stderr, "Function %s:\n", ZSTRING_VALUE(new_str));
+		char *funcName = ZSTRING_VALUE(new_str);
+		vld_printf(stderr, "Function %s:\n", vld_color(funcName, COLOR_GREEN));
 		vld_dump_oparray(fe TSRMLS_CC);
-		vld_printf(stderr, "End of function %s\n\n", ZSTRING_VALUE(new_str));
+		vld_printf(stderr, "End of function %s\n\n", vld_color(funcName, COLOR_GREEN));
 		efree(new_str);
 	}
 
@@ -288,7 +289,7 @@ static int vld_dump_cle (zend_class_entry *class_entry TSRMLS_DC)
 
 		zend_hash_apply_with_argument(&ce->function_table, (apply_func_arg_t) vld_check_fe, (void *)&have_fe TSRMLS_CC);
 		if (have_fe) {
-			vld_printf(stderr, "Class %s:\n", ZSTRING_VALUE(ce->name));
+			vld_printf(stderr, "Class %s:\n", vld_color(ZSTRING_VALUE(ce->name), COLOR_GREEN));
 			zend_hash_apply_with_arguments(&ce->function_table APPLY_TSRMLS_CC, (apply_func_args_t) vld_dump_fe, 0);
 			vld_printf(stderr, "End of class %s.\n\n", ZSTRING_VALUE(ce->name));
 		} else {
